@@ -1,28 +1,37 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container">
+    <volume-x-rate-chart :bus="bus"
+      v-if="loaded"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import VolumeXRateChart from './components/VolumeXRateChart.vue'
+import Vue from 'vue'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  components: { VolumeXRateChart },
+  data: () => ({
+    loaded: false,
+    chartdata: null,
+    bus: new Vue()
+  }),
+  async mounted () {
+    this.loaded = false
+    try {
+      // const { userlist } = await fetch('/api/userlist')
+      // this.chartdata = mydata
+      this.loaded = true
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style scoped>
+.container {
+    height: 90vh;
 }
 </style>
