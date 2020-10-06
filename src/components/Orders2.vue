@@ -155,6 +155,11 @@ export default {
   },
   mounted () {
     this.bus.$emit('max-y-changed', this.maxY())
+  },
+  watch: {
+    orders () {
+      this.bus.$emit('max-y-changed', this.maxY())
+    }
   }
 }
 </script>
