@@ -1,19 +1,35 @@
 
 import * as d3 from 'd3'
 
-export function computeCumMaxSellAmount (orders, amm) {
+export function computeCumMaxSellAmount2 (orders, amm) {
   let cumMaxSellAmount = 0
   for (let i = 0; i < orders.length; ++i) {
     cumMaxSellAmount += orders[i].ymax
   }
   const marginalXRate = amm.b2 / amm.b1
   const maxPi = orders[orders.length - 1].pi
-  const dj2 = marginalXRate <= maxPi ? amm.b2 / maxPi - amm.b1 : 0
-  return cumMaxSellAmount + Math.max(-dj2, 0)
+  const dj = marginalXRate <= maxPi ? amm.b2 / maxPi - amm.b1 : 0
+  return cumMaxSellAmount + Math.max(-dj, 0)
 }
 
-export function computeMaxVolume (orders, amm, priceSellToken) {
-  const cumMaxSellAmount = computeCumMaxSellAmount(orders, amm)
+export function computeMaxVolume2 (orders, amm, priceSellToken) {
+  const cumMaxSellAmount = computeCumMaxSellAmount2(orders, amm)
+  return cumMaxSellAmount * priceSellToken
+}
+
+export function computeCumMaxSellAmount1 (orders, amm) {
+  let cumMaxSellAmount = 0
+  for (let i = 0; i < orders.length; ++i) {
+    cumMaxSellAmount += orders[i].ymax
+  }
+  const marginalXRate = amm.b2 / amm.b1
+  const maxPi = orders[orders.length - 1].pi
+  const dk = marginalXRate >= maxPi ? -amm.b2 + amm.b1 * maxPi : 0
+  return cumMaxSellAmount + Math.max(-dk, 0)
+}
+
+export function computeMaxVolume1 (orders, amm, priceSellToken) {
+  const cumMaxSellAmount = computeCumMaxSellAmount1(orders, amm)
   return cumMaxSellAmount * priceSellToken
 }
 

@@ -45,7 +45,7 @@ export default {
       return this.orders[0].pi
     },
     maxY () {
-      return util.computeMaxVolume(
+      return util.computeMaxVolume1(
         this.orders,
         this.amm,
         1
@@ -115,6 +115,7 @@ export default {
     },
     dragVertex (index, event) {
       this.draggingVertex = index
+      console.log('dragging ' + this.draggingVertex)
       this.$root.$el.addEventListener('mousemove', this.moveVertex)
     },
     onMouseUp () {
@@ -139,11 +140,15 @@ export default {
         this.bus.$emit('pi-changed', orderIdx, pi)
       } else {
         const orderIdx = (this.draggingVertex - 1) / 2
+        console.log('orderIdx: ' + orderIdx)
         const cumMaxVolume = orderIdx > 0
-          ? util.computeMaxVolume(this.orders.slice(0, orderIdx), this.amm, 1)
+          ? util.computeMaxVolume1(this.orders.slice(0, orderIdx), this.amm, 1)
           : 0
         const cumY = ptSvg[1]
         const ymax = Math.max(cumY - cumMaxVolume, 0)
+        console.log('cumY: ' + cumY)
+        console.log('cumMaxVolume: ' + cumMaxVolume)
+        console.log('move: ' + cumY)
         this.bus.$emit('ymax-changed', orderIdx, ymax)
       }
     }

@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     maxY () {
-      return util.computeMaxVolume(
+      return util.computeMaxVolume2(
         this.orders,
         this.amm,
         this.orders[this.orders.length - 1].pi
@@ -139,7 +139,7 @@ export default {
       } else {
         const orderIdx = (this.draggingVertex - 1) / 2
         const cumMaxVolume = orderIdx > 0
-          ? util.computeMaxVolume(this.orders.slice(0, orderIdx), this.amm, 1)
+          ? util.computeMaxVolume2(this.orders.slice(0, orderIdx), this.amm, 1)
           : 0
         const cumY = ptSvg[1]
         const ymax = Math.max(cumY - cumMaxVolume, 0)
