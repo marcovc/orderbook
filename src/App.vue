@@ -20,6 +20,7 @@
                   <v-radio label="xx=price(T2), yy=amount(T1)" value="X2Y1"></v-radio>
                   <v-radio label="xx=price(T2), yy=amount(T2)" value="X2Y2"></v-radio>
                 </v-radio-group>
+                <p>Orange orders sell T1, blue orders sell T2.</p>
               </v-col>
             </v-row>
           </v-col>
