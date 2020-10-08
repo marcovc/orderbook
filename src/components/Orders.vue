@@ -222,7 +222,7 @@ export default {
         const x = this.mapAMMToX()
         vs.push([x, 0])
         const firstOrderX = this.mapPiToX(this.orders[0].pi)
-        vs = vs.concat(vs, this.curveY(x, firstOrderX, 0, false, this.mapAMMXToY))
+        vs = vs.concat(this.curveY(x, firstOrderX, 0, false, this.mapAMMXToY))
         return util.verticesToSvgPath(vs)
       } else {
         const vs = this.ammPathVertices()
