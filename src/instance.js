@@ -4,7 +4,7 @@ const orderJsonSchema = {
   id: '/Order',
   type: 'object',
   properties: {
-    sellAmount: { type: 'number', minimum: 0, exclusiveMinimum: true },
+    sellAmount: { type: 'number', minimum: 0 },
     buyAmount: { type: 'number', minimum: 0, exclusiveMinimum: true }
   },
   required: ['sellAmount', 'buyAmount']
@@ -13,7 +13,7 @@ const orderJsonSchema = {
 const instanceJsonSchema = {
   type: 'object',
   properties: {
-    blueOrders: {
+    ordersSellingT1: {
       type: 'array',
       required: true,
       length: {
@@ -23,7 +23,7 @@ const instanceJsonSchema = {
         $ref: '/Order'
       }
     },
-    orangeOrders: {
+    ordersSellingT2: {
       type: 'array',
       required: true,
       length: {
@@ -37,13 +37,13 @@ const instanceJsonSchema = {
       type: 'object',
       required: true,
       properties: {
-        marginalXRate: {
+        balanceT1: {
           type: 'number',
           required: true,
           minimum: 0,
           exclusiveMinimum: true
         },
-        volume: {
+        balanceT2: {
           type: 'number',
           required: true,
           minimum: 0,

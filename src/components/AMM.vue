@@ -33,7 +33,7 @@ export default {
     onMouseUp () {
       this.isDragging = false
       this.$root.$el.removeEventListener('mousemove', this.moveVertex)
-      this.bus.$emit('max-x-changed', this.marginalXRate)
+      this.bus.$emit('arg-min-y-changed', this.marginalXRate)
     },
     moveVertex (event) {
       const ptSvg = this.$parent.dom2svg(
@@ -50,7 +50,7 @@ export default {
     window.removeEventListener('mousemove', this.onMouseUp)
   },
   mounted () {
-    this.bus.$emit('max-x-changed', this.marginalXRate)
+    this.bus.$emit('arg-min-y-changed', this.marginalXRate)
   }
 }
 </script>

@@ -1,51 +1,73 @@
 <template>
 <svg ref="svgCanvas" width="100%" height="100%" :viewBox="`0 0 ${maxX} ${maxY}`" transform="scale(1,-1)" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="100%" height="100%" fill="transparent" stroke="black" vector-effect="non-scaling-stroke"/>
-    <orders1 ref="orders1" :orders="orders1" :amm="amm" :amm-is-mandatory="ammIsMandatory" :bus="bus1"/>
-    <orders2 ref="orders2" :max-x="maxX" :orders="orders2" :amm="amm" :amm-is-mandatory="ammIsMandatory" :bus="bus2"/>
+    <orders
+      ref="ordersSellingT2"
+      :arg-max-y="ordersSellingT2ArgMaxY"
+      :orders="ordersSellingT2"
+      :amm="amm"
+      :amm-is-mandatory="ammIsMandatory"
+      :bus="bus2"
+      :referential="ordersSellingT2Referential"
+      color="rgb(31,119,180)"
+    />
+    <orders
+      ref="ordersSellingT1"
+      :arg-max-y="ordersSellingT1ArgMaxY"
+      :orders="ordersSellingT1"
+      :amm="amm"
+      :amm-is-mandatory="ammIsMandatory"
+      :bus="bus1"
+      :referential="ordersSellingT1Referential"
+      color="rgb(255, 127, 14)"
+    />
     <a-m-m ref="amm" :marginal-x-rate="marginalXRate" :bus="busAMM"/>
 </svg>
 </template>
 
 <script>
 import Vue from 'vue'
-import Orders1 from './Orders1.vue'
-import Orders2 from './Orders2.vue'
+import Orders from './Orders.vue'
 import AMM from './AMM.vue'
+import { REFERENTIALS } from '../referentials.js'
 
 export default {
   name: 'VolumeXRateChart',
-  components: { Orders1, Orders2, AMM },
+  components: { Orders, AMM },
   props: {
     bus: {
       type: Object
     },
     instance: {
       type: Object
+    },
+    referential: {
+      type: String
     }
   },
   data: () => ({
-    bus1: new Vue(),
     bus2: new Vue(),
+    bus1: new Vue(),
     busAMM: new Vue(),
     ammIsMandatory: false,
     amm: {
       b1: 1,
-      b2: 1
+      b2: 1,
+      mandatory: false
     },
-    orders1: [{
-      pi: 5,
-      ymax: 1
-    }, {
-      pi: 2,
-      ymax: 0.5
-    }],
-    orders2: [{
+    ordersSellingT1: [{
       pi: 0.3,
       ymax: 0.5
     }, {
       pi: 1,
       ymax: 2
+    }],
+    ordersSellingT2: [{
+      pi: 5,
+      ymax: 1
+    }, {
+      pi: 2,
+      ymax: 0.5
     }],
     maxX: 100,
     maxY: 100
@@ -70,85 +92,122 @@ export default {
       return [domP.x, domP.y]
     },
     updateData (instance) {
-      const orders1 = instance.blueOrders.map(o => ({
+      const ordersSellingT2 = instance.ordersSellingT2.map(o => ({
         ymax: o.sellAmount,
         pi: o.sellAmount / o.buyAmount
       })).sort((o1, o2) => o2.pi - o1.pi)
 
-      const orders2 = instance.orangeOrders.map(o => ({
+      const ordersSellingT1 = instance.ordersSellingT1.map(o => ({
         ymax: o.sellAmount,
-        pi: o.buyAmount / o.sellAmount // for every o2, pi is actually 1/pi for convenience
-      })).sort((o1, o2) => o1.pi - o2.pi)
+        pi: o.sellAmount / o.buyAmount
+      })).sort((o1, o2) => o2.pi - o1.pi)
 
       const amm = {
-        b1: instance.amm.volume / (2 * instance.amm.marginalXRate),
-        b2: instance.amm.volume / 2
+        b1: instance.amm.balanceT1,
+        b2: instance.amm.balanceT2
       }
 
       amm.k = amm.b1 * amm.b2
-      this.orders1 = orders1
-      this.orders2 = orders2
+
+      this.ordersSellingT2 = ordersSellingT2
+      this.ordersSellingT1 = ordersSellingT1
       this.amm = amm
       this.ammIsMandatory = instance.amm.mandatory
     },
     updatedInstance () {
       const instance = {}
-      instance.blueOrders = this.orders1.map(o => ({
+      instance.ordersSellingT2 = this.ordersSellingT2.map(o => ({
         sellAmount: o.ymax,
         buyAmount: o.ymax / o.pi
       }))
-      instance.orangeOrders = this.orders2.map(o => ({
+      instance.ordersSellingT1 = this.ordersSellingT1.map(o => ({
         sellAmount: o.ymax,
-        buyAmount: o.ymax * o.pi
+        buyAmount: o.ymax / o.pi
       }))
       instance.amm = {
-        volume: 2 * this.amm.b2,
-        marginalXRate: this.marginalXRate
+        balanceT1: this.amm.b1,
+        balanceT2: this.amm.b2,
+        mandatory: this.ammIsMandatory
       }
-      instance.amm.mandatory = this.ammIsMandatory
       return instance
     }
   },
   computed: {
+    ordersSellingT1Referential () {
+      return REFERENTIALS[this.referential].ordersSellingT1
+    },
+    ordersSellingT2Referential () {
+      return REFERENTIALS[this.referential].ordersSellingT2
+    },
     marginalXRate () {
-      return this.amm.b2 / this.amm.b1
+      return (this.referential === 'X1Y1' || this.referential === 'X1Y2')
+        ? this.amm.b2 / this.amm.b1
+        : this.amm.b1 / this.amm.b2
+    },
+    ordersSellingT1ArgMaxY () {
+      return this.ordersSellingT1Referential.increasing ? this.maxX : 0.001
+    },
+    ordersSellingT2ArgMaxY () {
+      return this.ordersSellingT2Referential.increasing ? this.maxX : 0.001
     }
   },
   created () {
     // to avoid accumulating round-off errors while moving the amm
     this.amm.k = this.amm.b1 * this.amm.b2
+
     this.bus1.$on('max-y-changed', maxY => {
-      if (this.$refs.orders2 !== undefined) {
-        maxY = Math.max(maxY, this.$refs.orders2.maxY())
+      if (this.$refs.ordersSellingT2 !== undefined) {
+        maxY = Math.max(maxY, this.$refs.ordersSellingT2.maxY())
       }
       this.maxY = maxY * 1.1
       this.bus.$emit('instance-changed', this.updatedInstance())
-    })
-    this.bus1.$on('max-x-changed', maxX => {
-      this.maxX = Math.max(maxX, this.marginalXRate) * 1.1
-    })
-    this.bus1.$on('pi-changed', (orderIdx, pi) => {
-      this.orders1[orderIdx].pi = pi
-    })
-    this.bus1.$on('ymax-changed', (orderIdx, ymax) => {
-      this.orders1[orderIdx].ymax = ymax
     })
     this.bus2.$on('max-y-changed', maxY => {
-      if (this.$refs.orders1 !== undefined) {
-        maxY = Math.max(maxY, this.$refs.orders1.maxY())
+      if (this.$refs.ordersSellingT1 !== undefined) {
+        maxY = Math.max(maxY, this.$refs.ordersSellingT1.maxY())
       }
       this.maxY = maxY * 1.1
       this.bus.$emit('instance-changed', this.updatedInstance())
     })
+
+    this.bus1.$on('pi-changed', (orderIdx, pi) => {
+      this.ordersSellingT1[orderIdx].pi = pi
+    })
     this.bus2.$on('pi-changed', (orderIdx, pi) => {
-      this.orders2[orderIdx].pi = pi
+      this.ordersSellingT2[orderIdx].pi = pi
+    })
+
+    this.bus1.$on('ymax-changed', (orderIdx, ymax) => {
+      this.ordersSellingT1[orderIdx].ymax = ymax
     })
     this.bus2.$on('ymax-changed', (orderIdx, ymax) => {
-      this.orders2[orderIdx].ymax = ymax
+      this.ordersSellingT2[orderIdx].ymax = ymax
     })
+
+    this.bus1.$on('arg-min-y-changed', maxX => {
+      this.maxX = Math.max(
+        maxX,
+        this.$refs.ordersSellingT2.argMinY(),
+        this.marginalXRate
+      ) * 1.1
+    })
+    this.bus2.$on('arg-min-y-changed', maxX => {
+      this.maxX = Math.max(
+        maxX,
+        this.$refs.ordersSellingT1.argMinY(),
+        this.marginalXRate
+      ) * 1.1
+    })
+
     this.busAMM.$on('marginal-xrate-changed', marginalXRate => {
-      const b1 = Math.sqrt(this.amm.k / marginalXRate)
-      const b2 = this.amm.k / b1
+      let b1, b2
+      if (this.referential === 'X1Y1' || this.referential === 'X1Y2') {
+        b1 = Math.sqrt(this.amm.k / marginalXRate)
+        b2 = this.amm.k / b1
+      } else {
+        b2 = Math.sqrt(this.amm.k / marginalXRate)
+        b1 = this.amm.k / b2
+      }
       this.amm.b1 = b1
       this.amm.b2 = b2
     })

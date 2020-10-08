@@ -6,15 +6,20 @@
           <v-col cols='8'>
             <v-row>
               <v-col class='pt-0 pb-0 pr-0' style='height:50vh;'>
-                <volume-x-rate-chart v-if='validationErrors.length === 0' :instance='instance' :bus='bus'/>
+                <volume-x-rate-chart v-if='validationErrors.length === 0' :instance='instance' :bus='bus' :referential='referential'/>
                 <p v-for='(e, idx) in validationErrors' :key='idx'>
                   {{ e.stack }}
                 </p>
               </v-col>
             </v-row>
-            <v-row class='text-center' style='height:45vh;'>
+            <v-row>
               <v-col>
-                free space
+                <v-radio-group v-model="referential">
+                  <v-radio label="xx=price(T1), yy=amount(T1)" value="X1Y1"></v-radio>
+                  <v-radio label="xx=price(T1), yy=amount(T2)" value="X1Y2"></v-radio>
+                  <v-radio label="xx=price(T2), yy=amount(T1)" value="X2Y1"></v-radio>
+                  <v-radio label="xx=price(T2), yy=amount(T2)" value="X2Y2"></v-radio>
+                </v-radio-group>
               </v-col>
             </v-row>
           </v-col>
@@ -50,18 +55,9 @@ export default {
   data: () => ({
     validationErrors: [],
     bus: new Vue(),
+    referential: 'X1Y1',
     instance: {
-      blueOrders: [
-        {
-          sellAmount: 1,
-          buyAmount: 0.2
-        },
-        {
-          sellAmount: 0.5,
-          buyAmount: 0.25
-        }
-      ],
-      orangeOrders: [
+      ordersSellingT1: [
         {
           sellAmount: 0.5,
           buyAmount: 0.15
@@ -71,10 +67,20 @@ export default {
           buyAmount: 2
         }
       ],
+      ordersSellingT2: [
+        {
+          sellAmount: 1,
+          buyAmount: 0.2
+        },
+        {
+          sellAmount: 0.5,
+          buyAmount: 0.25
+        }
+      ],
       amm: {
-        volume: 2,
-        marginalXRate: 1,
-        mandatory: false
+        balanceT1: 1,
+        balanceT2: 1,
+        mandatory: true
       }
     }
   }),
