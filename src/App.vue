@@ -15,12 +15,12 @@
             <v-row>
               <v-col>
                 <v-radio-group v-model="referential">
-                  <v-radio label="xx=price(T1), yy=amount(T1)" value="X1Y1"></v-radio>
-                  <v-radio label="xx=price(T1), yy=amount(T2)" value="X1Y2"></v-radio>
-                  <v-radio label="xx=price(T2), yy=amount(T1)" value="X2Y1"></v-radio>
-                  <v-radio label="xx=price(T2), yy=amount(T2)" value="X2Y2"></v-radio>
+                  <v-radio label="xx is price of T1, yy is sell amount of T1" value="X1Y1"></v-radio>
+                  <v-radio label="xx is price of T1, yy is sell amount of T2" value="X1Y2"></v-radio>
+                  <v-radio label="xx is price of T2, yy is sell amount of T1" value="X2Y1"></v-radio>
+                  <v-radio label="xx is price of T2, yy is sell amount of T2" value="X2Y2"></v-radio>
                 </v-radio-group>
-                <p>Orange orders sell T1, blue orders sell T2.</p>
+                <p>Orders selling T1 are orange, orders selling T2 are blue.</p>
               </v-col>
             </v-row>
           </v-col>
