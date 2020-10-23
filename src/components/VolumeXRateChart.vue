@@ -215,6 +215,9 @@ export default {
   watch: {
     instance (newval, oldval) {
       this.updateData(newval)
+    },
+    referential (newval, oldval) {
+      this.updateData(this.instance)
     }
   },
   mounted () {
