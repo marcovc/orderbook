@@ -19,6 +19,7 @@
                   <v-radio label="xx is price of T1, yy is sell amount of T2" value="X1Y2"></v-radio>
                   <v-radio label="xx is price of T2, yy is sell amount of T1" value="X2Y1"></v-radio>
                   <v-radio label="xx is price of T2, yy is sell amount of T2" value="X2Y2"></v-radio>
+                  <v-radio label="xx is xrate [p(T1)/p(T2)], yy is volume [amount of TX * price of TX]" value="X12YV"></v-radio>
                 </v-radio-group>
                 <p>Orders selling T1 are orange, orders selling T2 are blue.</p>
               </v-col>

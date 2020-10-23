@@ -51,6 +51,31 @@ export const REFERENTIALS = {
     }
   },
 
+  // yy displays volume: amount(T1)*p(T1) = amount(T2)*p(T2)
+  // xx displays p(T1)/p(T2)
+  // assumes 0.5 * p(token 1) + 0.5 * p(token 2) = 1, i.e.
+  // xrate{T1->T2} = p(T1)/p(T2) = 2/p(T2) - 1 = p(T1)/(2 - p(T1))
+  X12YV: {
+    ordersSellingT2: {
+      mapAToY: (a, x) => a / x * 2 / (1 + x),
+      mapYToA: (y, x) => y / (2 / (1 + x)) * x,
+      mapPiToX: pi => pi,
+      mapXToPi: x => x,
+      mapAMMToX: amm => amm.b2 / amm.b1,
+      mapAMMXToY: (amm, x) => Math.max(0, (amm.b2 / x - amm.b1) * 2 / (1 + x)),
+      increasing: false
+    },
+    ordersSellingT1: {
+      mapAToY: (a, x) => a * (2 * x) / (1 + x),
+      mapYToA: (y, x) => y / ((2 * x) / (1 + x)),
+      mapPiToX: pi => 1 / pi,
+      mapXToPi: x => 1 / x,
+      mapAMMToX: amm => amm.b2 / amm.b1,
+      mapAMMXToY: (amm, x) => Math.max(0, (-amm.b2 / x + amm.b1) * (2 * x) / (1 + x)),
+      increasing: true
+    }
+  },
+
   // yy displays amount of token 1
   // xx displays price of token 2
   // => token 1 is the reference token, i.e. p(t1) = 1

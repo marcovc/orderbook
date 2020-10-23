@@ -140,7 +140,7 @@ export default {
       return REFERENTIALS[this.referential].ordersSellingT2
     },
     marginalXRate () {
-      return (this.referential === 'X1Y1' || this.referential === 'X1Y2')
+      return (this.referential === 'X1Y1' || this.referential === 'X12YV' || this.referential === 'X1Y2')
         ? this.amm.b2 / this.amm.b1
         : this.amm.b1 / this.amm.b2
     },
@@ -201,7 +201,7 @@ export default {
 
     this.busAMM.$on('marginal-xrate-changed', marginalXRate => {
       let b1, b2
-      if (this.referential === 'X1Y1' || this.referential === 'X1Y2') {
+      if (this.referential === 'X1Y1' || this.referential === 'X12YV' || this.referential === 'X1Y2') {
         b1 = Math.sqrt(this.amm.k / marginalXRate)
         b2 = this.amm.k / b1
       } else {
